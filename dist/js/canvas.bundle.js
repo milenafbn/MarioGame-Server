@@ -86,6 +86,32 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/img/background.png":
+/*!********************************!*\
+  !*** ./src/img/background.png ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "ba150ebc2b39b5f60a678e136022b837.png");
+
+/***/ }),
+
+/***/ "./src/img/hills.png":
+/*!***************************!*\
+  !*** ./src/img/hills.png ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "cfffe4c371f5e11d372b398a87c51dd0.png");
+
+/***/ }),
+
 /***/ "./src/img/myplatform.png":
 /*!********************************!*\
   !*** ./src/img/myplatform.png ***!
@@ -95,7 +121,7 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "68ded96849c5f086e582ad5fbbd2a9db.png");
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "6eaaec169ab6ed1696460f8742e2abed.png");
 
 /***/ }),
 
@@ -109,6 +135,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../img/myplatform.png */ "./src/img/myplatform.png");
+/* harmony import */ var _img_hills_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../img/hills.png */ "./src/img/hills.png");
+/* harmony import */ var _img_background_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../img/background.png */ "./src/img/background.png");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -116,7 +144,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-console.log(_img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+
 var canvas = document.querySelector('canvas');
 var c = canvas.getContext('2d');
 canvas.width = 1024; //tag canvas takes up the full width
@@ -192,18 +221,61 @@ var Platform = /*#__PURE__*/function () {
   return Platform;
 }();
 
-var image = new Image();
-image.src = _img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__["default"];
-console.log(image);
+var GenericObject = /*#__PURE__*/function () {
+  function GenericObject(_ref2) {
+    var x = _ref2.x,
+        y = _ref2.y,
+        image = _ref2.image;
+
+    _classCallCheck(this, GenericObject);
+
+    this.position = {
+      x: x,
+      // = x: x,
+      y: y // = y: y
+
+    };
+    this.image = image;
+    this.width = image.width;
+    this.height = image.height;
+  }
+
+  _createClass(GenericObject, [{
+    key: "draw",
+    value: function draw() {
+      c.drawImage(this.image, this.position.x, this.position.y);
+    }
+  }]);
+
+  return GenericObject;
+}();
+
+function createImage(imageSrc) {
+  var image = new Image();
+  image.src = imageSrc;
+  return image;
+}
+
+var myplatformImage = createImage(_img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__["default"]); //como createImage(myplatform) se repete muito, criou-se uma variavel
+
 var player = new Player();
 var platforms = [new Platform({
   x: -1,
   y: 470,
-  image: image
+  image: myplatformImage
 }), new Platform({
-  x: image.width - 0.9,
+  x: myplatformImage.width - 0.9,
   y: 470,
-  image: image
+  image: myplatformImage
+})];
+var genericObject = [new GenericObject({
+  x: -1,
+  y: 0,
+  image: createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_2__["default"])
+}), new GenericObject({
+  x: -1,
+  y: 0,
+  image: createImage(_img_hills_png__WEBPACK_IMPORTED_MODULE_1__["default"])
 })];
 var keys = {
   right: {
@@ -218,8 +290,10 @@ var scrollOffset = 0; //deslocamento de rolagem
 function animate() {
   requestAnimationFrame(animate);
   c.fillStyle = 'white';
-  c.fillRect(0, 0, canvas.width, canvas.height); //limpa toda a tela
-
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  genericObject.forEach(function (genericObject) {
+    genericObject.draw();
+  });
   platforms.forEach(function (platform) {
     platform.draw();
   });
@@ -237,10 +311,16 @@ function animate() {
       platforms.forEach(function (platform) {
         platform.position.x -= 5;
       });
+      genericObject.forEach(function (genericObject) {
+        genericObject.position.x -= 3;
+      });
     } else if (keys.left.pressed) {
       scrollOffset -= 5;
       platforms.forEach(function (platform) {
         platform.position.x += 5;
+      });
+      genericObject.forEach(function (genericObject) {
+        genericObject.position.x += 3;
       });
     }
   } //console.log(scrollOffset)
@@ -259,8 +339,8 @@ function animate() {
 }
 
 animate();
-addEventListener('keydown', function (_ref2) {
-  var keyCode = _ref2.keyCode;
+addEventListener('keydown', function (_ref3) {
+  var keyCode = _ref3.keyCode;
 
   switch (keyCode) {
     case 37:
@@ -290,8 +370,8 @@ addEventListener('keydown', function (_ref2) {
       console.log('invalid key');
   }
 });
-addEventListener('keyup', function (_ref3) {
-  var keyCode = _ref3.keyCode;
+addEventListener('keyup', function (_ref4) {
+  var keyCode = _ref4.keyCode;
 
   switch (keyCode) {
     case 37:

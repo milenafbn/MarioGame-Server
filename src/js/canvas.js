@@ -1,5 +1,6 @@
-import myplatform from '../img/myplatform.png';
-console.log(myplatform)
+import myplatform from '../img/myplatform.png'
+import hills from '../img/hills.png'
+import background from '../img/background.png'
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
@@ -49,12 +50,9 @@ class Platform{
             x,  // = x: x,
             y  // = y: y
         }
-
         this.image = image
-
         this.width = image.width
         this.height = image.height
-
     }
 
     draw() {
@@ -62,15 +60,48 @@ class Platform{
     }
 }
 
-const image = new Image()
-image.src = myplatform
+class GenericObject{
+    constructor({x,y,image}){ 
+        this.position = {
+            x,  // = x: x,
+            y  // = y: y
+        }
+        this.image = image
+        this.width = image.width
+        this.height = image.height
+    }
 
-console.log(image)
+    draw() {
+        c.drawImage(this.image, this.position.x, this.position.y)
+    }
+}
+
+function createImage(imageSrc) {
+    const image = new Image()
+    image.src = imageSrc
+    return image
+}
+
+const myplatformImage = createImage(myplatform)//como createImage(myplatform) se repete muito, criou-se uma variavel
 
 const player = new Player()
-const platforms = [new Platform({x:-1, y:470, image}), 
-  new Platform({x: image.width - 0.9, y:470, image})]
+const platforms = [
+    new Platform({x:-1, y:470, image: myplatformImage}), 
+    new Platform({x: myplatformImage.width - 0.9, y:470, image: myplatformImage})
+]
 
+const genericObject = [
+    new GenericObject({
+        x: -1,
+        y: 0,
+        image: createImage(background)
+    }),
+    new GenericObject({
+        x: -1,
+        y: 0,
+        image: createImage(hills)
+    })
+]
 
 const keys = {
     right: {
@@ -86,8 +117,12 @@ let scrollOffset = 0 //deslocamento de rolagem
 function animate() {
     requestAnimationFrame(animate)
     c.fillStyle = 'white'
-    c.fillRect(0, 0, canvas.width, canvas.height) //limpa toda a tela
-    
+    c.fillRect(0, 0, canvas.width, canvas.height) 
+
+    genericObject.forEach(genericObject => {
+        genericObject.draw()
+    })
+
     platforms.forEach((platform) => {
         platform.draw()
     })
@@ -104,10 +139,16 @@ function animate() {
             platforms.forEach((platform) => {
                 platform.position.x -= 5
             })
+            genericObject.forEach(genericObject =>{
+                genericObject.position.x -= 3
+            })
         } else if (keys.left.pressed) {
             scrollOffset -= 5
             platforms.forEach((platform) => {
                 platform.position.x += 5
+            })
+            genericObject.forEach(genericObject =>{
+                genericObject.position.x += 3
             })
         }
     }
