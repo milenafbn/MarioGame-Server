@@ -99,16 +99,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/img/hills.png":
-/*!***************************!*\
-  !*** ./src/img/hills.png ***!
-  \***************************/
+/***/ "./src/img/hills2.png":
+/*!****************************!*\
+  !*** ./src/img/hills2.png ***!
+  \****************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "cfffe4c371f5e11d372b398a87c51dd0.png");
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "a62359a43be4ef3232f4f90e39bea1ed.png");
 
 /***/ }),
 
@@ -135,7 +135,7 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../img/myplatform.png */ "./src/img/myplatform.png");
-/* harmony import */ var _img_hills_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../img/hills.png */ "./src/img/hills.png");
+/* harmony import */ var _img_hills2_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../img/hills2.png */ "./src/img/hills2.png");
 /* harmony import */ var _img_background_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../img/background.png */ "./src/img/background.png");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -184,7 +184,7 @@ var Player = /*#__PURE__*/function () {
       this.draw();
       this.position.x += this.velocity.x;
       this.position.y += this.velocity.y;
-      if (this.position.y + this.height + this.velocity.y <= canvas.height) this.velocity.y += gravity;else this.velocity.y = 0;
+      if (this.position.y + this.height + this.velocity.y <= canvas.height) this.velocity.y += gravity;
     }
   }]);
 
@@ -267,6 +267,10 @@ var platforms = [new Platform({
   x: myplatformImage.width - 0.9,
   y: 470,
   image: myplatformImage
+}), new Platform({
+  x: myplatformImage.width * 2 + 100,
+  y: 470,
+  image: myplatformImage
 })];
 var genericObject = [new GenericObject({
   x: -1,
@@ -275,7 +279,7 @@ var genericObject = [new GenericObject({
 }), new GenericObject({
   x: -1,
   y: 0,
-  image: createImage(_img_hills_png__WEBPACK_IMPORTED_MODULE_1__["default"])
+  image: createImage(_img_hills2_png__WEBPACK_IMPORTED_MODULE_1__["default"])
 })];
 var keys = {
   right: {
@@ -286,6 +290,35 @@ var keys = {
   }
 };
 var scrollOffset = 0; //deslocamento de rolagem
+
+function init(params) {
+  myplatformImage = createImage(_img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__["default"]); //como createImage(myplatform) se repete muito, criou-se uma variavel
+
+  player = new Player();
+  platforms = [new Platform({
+    x: -1,
+    y: 470,
+    image: myplatformImage
+  }), new Platform({
+    x: myplatformImage.width - 0.9,
+    y: 470,
+    image: myplatformImage
+  }), new Platform({
+    x: myplatformImage.width * 2 + 100,
+    y: 470,
+    image: myplatformImage
+  })];
+  genericObject = [new GenericObject({
+    x: -1,
+    y: 0,
+    image: createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_2__["default"])
+  }), new GenericObject({
+    x: -1,
+    y: 0,
+    image: createImage(_img_hills2_png__WEBPACK_IMPORTED_MODULE_1__["default"])
+  })];
+  scrollOffset = 0; //deslocamento de rolagem
+}
 
 function animate() {
   requestAnimationFrame(animate);
@@ -331,10 +364,16 @@ function animate() {
     if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width) {
       player.velocity.y = 0;
     }
-  });
+  }); //win condition
 
   if (scrollOffset > 2000) {
     console.log('YOU WIN!');
+  } //lose condition
+
+
+  if (player.position.y > canvas.height) {
+    console.log('YOU LOSE');
+    init();
   }
 }
 

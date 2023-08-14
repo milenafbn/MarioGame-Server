@@ -1,5 +1,5 @@
 import myplatform from '../img/myplatform.png'
-import hills from '../img/hills.png'
+import hills from '../img/hills2.png'
 import background from '../img/background.png'
 
 const canvas = document.querySelector('canvas')
@@ -39,7 +39,6 @@ class Player{
 
         if(this.position.y + this.height + this.velocity.y <= canvas.height)
             this.velocity.y += gravity
-        else this.velocity.y = 0
     }
 }
 
@@ -82,15 +81,17 @@ function createImage(imageSrc) {
     return image
 }
 
-const myplatformImage = createImage(myplatform)//como createImage(myplatform) se repete muito, criou-se uma variavel
+let myplatformImage = createImage(myplatform)//como createImage(myplatform) se repete muito, criou-se uma variavel
 
-const player = new Player()
-const platforms = [
+let player = new Player()
+let platforms = [
     new Platform({x:-1, y:470, image: myplatformImage}), 
-    new Platform({x: myplatformImage.width - 0.9, y:470, image: myplatformImage})
+    new Platform({x: myplatformImage.width - 0.9, y:470, image: myplatformImage}),
+    new Platform({x: myplatformImage.width * 2 + 100, y:470, image: myplatformImage})
+
 ]
 
-const genericObject = [
+let genericObject = [
     new GenericObject({
         x: -1,
         y: 0,
@@ -113,6 +114,34 @@ const keys = {
 }
 
 let scrollOffset = 0 //deslocamento de rolagem
+
+function init(params) {
+
+    myplatformImage = createImage(myplatform)//como createImage(myplatform) se repete muito, criou-se uma variavel
+
+    player = new Player()
+    platforms = [
+        new Platform({x:-1, y:470, image: myplatformImage}), 
+        new Platform({x: myplatformImage.width - 0.9, y:470, image: myplatformImage}),
+        new Platform({x: myplatformImage.width * 2 + 100, y:470, image: myplatformImage})
+
+    ]
+
+    genericObject = [
+        new GenericObject({
+            x: -1,
+            y: 0,
+            image: createImage(background)
+        }),
+        new GenericObject({
+            x: -1,
+            y: 0,
+            image: createImage(hills)
+        })
+    ]
+
+    scrollOffset = 0 //deslocamento de rolagem
+}
 
 function animate() {
     requestAnimationFrame(animate)
@@ -166,8 +195,15 @@ function animate() {
         }
     })
 
+    //win condition
     if (scrollOffset > 2000) {
         console.log('YOU WIN!')
+    }
+
+    //lose condition
+    if (player.position.y > canvas.height){
+        console.log('YOU LOSE')
+        init()
     }
 }           
 
