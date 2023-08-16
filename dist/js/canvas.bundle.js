@@ -125,6 +125,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/img/platformSmallTall.png":
+/*!***************************************!*\
+  !*** ./src/img/platformSmallTall.png ***!
+  \***************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "666fa3072d7d6e2ab02025bb1050702f.png");
+
+/***/ }),
+
 /***/ "./src/js/canvas.js":
 /*!**************************!*\
   !*** ./src/js/canvas.js ***!
@@ -137,11 +150,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../img/myplatform.png */ "./src/img/myplatform.png");
 /* harmony import */ var _img_hills2_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../img/hills2.png */ "./src/img/hills2.png");
 /* harmony import */ var _img_background_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../img/background.png */ "./src/img/background.png");
+/* harmony import */ var _img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../img/platformSmallTall.png */ "./src/img/platformSmallTall.png");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/*
+$ cd /c/Users/milen/OneDrive/Documentos/GitHub/MarioGame
+$ cd mario-game-server
+$ export NODE_OPTIONS="--openssl-legacy-provider"
+$ npm start
+ */
 
 
 
@@ -159,6 +180,7 @@ var Player = /*#__PURE__*/function () {
     _classCallCheck(this, Player);
 
     //propriedades do jogador. Aqui ele vai ser um quadrado
+    this.speed = 10;
     this.position = {
       x: 100,
       y: 100
@@ -175,7 +197,7 @@ var Player = /*#__PURE__*/function () {
   _createClass(Player, [{
     key: "draw",
     value: function draw() {
-      c.fillStyle = 'blue';
+      c.fillStyle = 'red';
       c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
   }, {
@@ -258,29 +280,10 @@ function createImage(imageSrc) {
 
 var myplatformImage = createImage(_img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__["default"]); //como createImage(myplatform) se repete muito, criou-se uma variavel
 
+var platformSmallTallImage = createImage(_img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__["default"]);
 var player = new Player();
-var platforms = [new Platform({
-  x: -1,
-  y: 470,
-  image: myplatformImage
-}), new Platform({
-  x: myplatformImage.width - 0.9,
-  y: 470,
-  image: myplatformImage
-}), new Platform({
-  x: myplatformImage.width * 2 + 100,
-  y: 470,
-  image: myplatformImage
-})];
-var genericObject = [new GenericObject({
-  x: -1,
-  y: 0,
-  image: createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_2__["default"])
-}), new GenericObject({
-  x: -1,
-  y: 0,
-  image: createImage(_img_hills2_png__WEBPACK_IMPORTED_MODULE_1__["default"])
-})];
+var platforms = [];
+var genericObject = [];
 var keys = {
   right: {
     pressed: false
@@ -291,11 +294,15 @@ var keys = {
 };
 var scrollOffset = 0; //deslocamento de rolagem
 
-function init(params) {
+function init() {
   myplatformImage = createImage(_img_myplatform_png__WEBPACK_IMPORTED_MODULE_0__["default"]); //como createImage(myplatform) se repete muito, criou-se uma variavel
 
   player = new Player();
   platforms = [new Platform({
+    x: myplatformImage.width * 4 + 300 + myplatformImage.width - platformSmallTallImage.width,
+    y: 270,
+    image: platformSmallTallImage
+  }), new Platform({
     x: -1,
     y: 470,
     image: myplatformImage
@@ -305,6 +312,18 @@ function init(params) {
     image: myplatformImage
   }), new Platform({
     x: myplatformImage.width * 2 + 100,
+    y: 470,
+    image: myplatformImage
+  }), new Platform({
+    x: myplatformImage.width * 3 + 300,
+    y: 470,
+    image: myplatformImage
+  }), new Platform({
+    x: myplatformImage.width * 4 + 300,
+    y: 470,
+    image: myplatformImage
+  }), new Platform({
+    x: myplatformImage.width * 5 + 700,
     y: 470,
     image: myplatformImage
   })];
@@ -333,29 +352,31 @@ function animate() {
   player.update();
 
   if (keys.right.pressed && player.position.x < 400) {
-    player.velocity.x = 5;
-  } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5;
+    player.velocity.x = player.speed;
+  } else if (keys.left.pressed && player.position.x > 100 || keys.left.pressed && scrollOffset === 0 && player.position.x > 0) {
+    player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
 
     if (keys.right.pressed) {
-      scrollOffset += 5;
+      scrollOffset += player.speed;
       platforms.forEach(function (platform) {
-        platform.position.x -= 5;
+        platform.position.x -= player.speed;
       });
       genericObject.forEach(function (genericObject) {
-        genericObject.position.x -= 3;
+        genericObject.position.x -= player.speed * 0.66;
       });
-    } else if (keys.left.pressed) {
-      scrollOffset -= 5;
-      platforms.forEach(function (platform) {
-        platform.position.x += 5;
-      });
-      genericObject.forEach(function (genericObject) {
-        genericObject.position.x += 3;
-      });
-    }
+    } else if (keys.left.pressed && scrollOffset > 0
+    /*&& player.position.x > 0*/
+    ) {
+        scrollOffset -= player.speed;
+        platforms.forEach(function (platform) {
+          platform.position.x += player.speed;
+        });
+        genericObject.forEach(function (genericObject) {
+          genericObject.position.x += player.speed * 0.66;
+        });
+      }
   } //console.log(scrollOffset)
   //platform collision detection
 
@@ -366,7 +387,7 @@ function animate() {
     }
   }); //win condition
 
-  if (scrollOffset > 2000) {
+  if (scrollOffset > myplatformImage.width * 5 + 300 - 2) {
     console.log('YOU WIN!');
   } //lose condition
 
@@ -377,6 +398,7 @@ function animate() {
   }
 }
 
+init();
 animate();
 addEventListener('keydown', function (_ref3) {
   var keyCode = _ref3.keyCode;
@@ -402,7 +424,7 @@ addEventListener('keydown', function (_ref3) {
     case 38:
     case 87:
       console.log('up');
-      player.velocity.y -= 1;
+      player.velocity.y -= 12;
       break;
 
     default:
@@ -433,7 +455,6 @@ addEventListener('keyup', function (_ref4) {
     case 38:
     case 87:
       console.log('up');
-      player.velocity.y -= 20;
       break;
 
     default:

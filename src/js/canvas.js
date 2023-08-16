@@ -1,6 +1,15 @@
+/*
+$ cd /c/Users/milen/OneDrive/Documentos/GitHub/MarioGame
+$ cd mario-game-server
+$ export NODE_OPTIONS="--openssl-legacy-provider"
+$ npm start
+ */
+
+
 import myplatform from '../img/myplatform.png'
 import hills from '../img/hills2.png'
 import background from '../img/background.png'
+import platformSmallTall from '../img/platformSmallTall.png'
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
@@ -13,6 +22,7 @@ const gravity = 0.5
 class Player{
     constructor(){
         //propriedades do jogador. Aqui ele vai ser um quadrado
+        this.speed = 10
         this.position = {
             x: 100,
             y: 100
@@ -28,7 +38,7 @@ class Player{
     //method draw: desenhando o personagem
 
     draw() {
-        c.fillStyle = 'blue'
+        c.fillStyle = 'red'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
@@ -82,27 +92,11 @@ function createImage(imageSrc) {
 }
 
 let myplatformImage = createImage(myplatform)//como createImage(myplatform) se repete muito, criou-se uma variavel
+let platformSmallTallImage = createImage(platformSmallTall)
 
 let player = new Player()
-let platforms = [
-    new Platform({x:-1, y:470, image: myplatformImage}), 
-    new Platform({x: myplatformImage.width - 0.9, y:470, image: myplatformImage}),
-    new Platform({x: myplatformImage.width * 2 + 100, y:470, image: myplatformImage})
-
-]
-
-let genericObject = [
-    new GenericObject({
-        x: -1,
-        y: 0,
-        image: createImage(background)
-    }),
-    new GenericObject({
-        x: -1,
-        y: 0,
-        image: createImage(hills)
-    })
-]
+let platforms = []
+let genericObject = []
 
 const keys = {
     right: {
@@ -115,15 +109,19 @@ const keys = {
 
 let scrollOffset = 0 //deslocamento de rolagem
 
-function init(params) {
+function init() {
 
     myplatformImage = createImage(myplatform)//como createImage(myplatform) se repete muito, criou-se uma variavel
 
     player = new Player()
     platforms = [
+        new Platform({x: myplatformImage.width * 4 + 300 + myplatformImage.width - platformSmallTallImage.width, y:270, image: platformSmallTallImage}),
         new Platform({x:-1, y:470, image: myplatformImage}), 
         new Platform({x: myplatformImage.width - 0.9, y:470, image: myplatformImage}),
-        new Platform({x: myplatformImage.width * 2 + 100, y:470, image: myplatformImage})
+        new Platform({x: myplatformImage.width * 2 + 100, y:470, image: myplatformImage}),
+        new Platform({x: myplatformImage.width * 3 + 300, y:470, image: myplatformImage}),
+        new Platform({x: myplatformImage.width * 4 + 300, y:470, image: myplatformImage}),
+        new Platform({x: myplatformImage.width * 5 + 700, y:470, image: myplatformImage})
 
     ]
 
@@ -156,28 +154,32 @@ function animate() {
         platform.draw()
     })
     player.update()
+
     if (keys.right.pressed && player.position.x < 400){
-        player.velocity.x = 5
-    }else if (keys.left.pressed && player.position.x > 100) {
-        player.velocity.x = -5
+        player.velocity.x = player.speed
+    }else if (
+        (keys.left.pressed && player.position.x > 100) || 
+        (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)
+        ) {
+        player.velocity.x = -player.speed
     }else {
         player.velocity.x = 0
 
         if (keys.right.pressed) {
-            scrollOffset += 5
+            scrollOffset += player.speed
             platforms.forEach((platform) => {
-                platform.position.x -= 5
+                platform.position.x -= player.speed
             })
             genericObject.forEach(genericObject =>{
-                genericObject.position.x -= 3
+                genericObject.position.x -= player.speed * 0.66
             })
-        } else if (keys.left.pressed) {
-            scrollOffset -= 5
+        } else if (keys.left.pressed && scrollOffset > 0 /*&& player.position.x > 0*/) {
+            scrollOffset -= player.speed
             platforms.forEach((platform) => {
-                platform.position.x += 5
+                platform.position.x += player.speed
             })
             genericObject.forEach(genericObject =>{
-                genericObject.position.x += 3
+                genericObject.position.x += player.speed * 0.66
             })
         }
     }
@@ -186,7 +188,8 @@ function animate() {
 
     //platform collision detection
     platforms.forEach((platform) => {
-        if (player.position.y + player.height <= platform.position.y 
+        if (
+            player.position.y + player.height <= platform.position.y 
         && player.position.y + player.height + player.velocity.y 
         >= platform.position.y && player.position.x + player.width
         >= platform.position.x && player.position.x 
@@ -196,7 +199,7 @@ function animate() {
     })
 
     //win condition
-    if (scrollOffset > 2000) {
+    if (scrollOffset > myplatformImage.width * 5 +300-2) {
         console.log('YOU WIN!')
     }
 
@@ -205,8 +208,9 @@ function animate() {
         console.log('YOU LOSE')
         init()
     }
-}           
+} 
 
+init()
 animate()
 
 addEventListener('keydown', ({ keyCode }) => {
@@ -228,7 +232,7 @@ addEventListener('keydown', ({ keyCode }) => {
         case 38:
         case 87:
             console.log('up')
-            player.velocity.y -= 1
+            player.velocity.y -= 12
             break
         default:
             console.log('invalid key')
@@ -254,7 +258,6 @@ addEventListener('keyup', ({ keyCode }) => {
         case 38:
         case 87:
             console.log('up')
-            player.velocity.y -= 20
             break
         default:
             console.log('invalid key')
